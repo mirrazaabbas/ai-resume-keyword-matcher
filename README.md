@@ -1,90 +1,66 @@
 # AI Resume Keyword Matcher
 
 [![CI](https://github.com/mirrazaabbas/ai-resume-keyword-matcher/actions/workflows/ci.yml/badge.svg)](https://github.com/mirrazaabbas/ai-resume-keyword-matcher/actions/workflows/ci.yml)
+[![Security](https://github.com/mirrazaabbas/ai-resume-keyword-matcher/actions/workflows/security.yml/badge.svg)](https://github.com/mirrazaabbas/ai-resume-keyword-matcher/actions/workflows/security.yml)
 
-A truth-preserving Python resume/job-description analysis tool. It keeps the original lightweight keyword CLI while adding structured ATS-style scoring for skills, keywords, multi-word phrases, missing requirements, and machine-readable reporting.
+A transparent, truth-preserving resume/job-description analysis tool. It combines explainable ATS-style skill and keyword scoring with structured job-requirement extraction, resume-section checks, lexical similarity, optional PDF/DOCX ingestion, JSON output and a safe standalone HTML report.
 
-## Implemented features
+## What it analyzes
 
-### Lightweight matcher
+- required vs preferred skills from structured job descriptions
+- hard, soft and multi-word skills
+- matched and missing required skills
+- keyword overlap and lexical cosine similarity
+- stated experience-year requirements
+- education terms appearing in the JD
+- presence of summary, experience, skills, education, certifications and projects sections
+- truthful recommendations that never instruct a candidate to invent unsupported experience
 
-- Resume/job text tokenization
-- Stopword filtering
-- Keyword frequency ranking
-- Match percentage
-- Matched and missing keyword lists
-- UTF-8/file validation
-- CLI workflow
+## Supported documents
 
-### Structured ATS analysis
-
-`ats.py` adds:
-
-- Separate skill and keyword scores
-- Weighted ATS-style overall score
-- Hard-skill detection
-- Soft-skill detection
-- Multi-word skill/phrase detection
-- Matched skill reporting
-- Missing skill reporting
-- Matched/missing keyword reporting
-- JSON output helper
-- Escaped standalone HTML report helper
-- Explicit truthfulness rule for missing skills
-
-The analyzer does **not** tell users to claim skills they do not have. Missing items are presented as review gaps and may only be added when genuinely supported by experience.
-
-## Run the original CLI
+TXT and Markdown work with the base install. PDF and DOCX are available through the optional `documents` extra using `pypdf` and `python-docx`.
 
 ```bash
-python app.py sample_resume.txt sample_job.txt
+python -m pip install ".[documents]"
 ```
 
-## Run structured ATS analysis
+## CLI
 
-```python
-from pathlib import Path
-import ats
-
-resume = Path("sample_resume.txt").read_text(encoding="utf-8")
-job = Path("sample_job.txt").read_text(encoding="utf-8")
-
-result = ats.analyze(resume, job)
-print(ats.to_json(result))
+```bash
+resume-ats resume.pdf job-description.docx --format json --json report.json --html report.html
 ```
 
-The result includes:
+Source checkout:
 
-```text
-ats_score
-skill_score
-keyword_score
-matched_skills
-missing_skills
-matched_keywords
-missing_keywords
-truth_rule
+```bash
+python app.py sample_resume.txt sample_job.txt --html report.html
 ```
+
+## Scoring boundary
+
+The score is an **explainable portfolio heuristic**. It is not presented as the proprietary algorithm of Workday, Greenhouse, Lever, Taleo or any other commercial ATS. The tool surfaces gaps for review; a missing skill should only be added to a resume when it is genuinely supported by the candidate's experience.
+
+## Engineering evidence
+
+- installable Python package and `resume-ats` CLI
+- Python 3.10–3.12 CI
+- branch-coverage quality gate
+- wheel build/install smoke test
+- safe HTML escaping
+- CodeQL static analysis
+- dependency audit and CycloneDX SBOM generation
+- weekly Dependabot maintenance
 
 ## Quality checks
 
 ```bash
-python -m pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt ".[documents]" build
 ruff check .
 coverage run -m unittest discover -s tests -v
 coverage report --fail-under=80
+python -m build
 ```
-
-CI runs on Python 3.10–3.12 and covers both the original matcher and the structured ATS module.
-
-## Dependency maintenance
-
-Dependabot is configured for weekly Python and GitHub Actions dependency updates.
-
-## Current scope
-
-This project demonstrates transparent deterministic resume/JD matching. The ATS score is an explainable portfolio heuristic, **not** a claim to reproduce the proprietary ranking algorithm of every commercial applicant tracking system. Semantic embeddings, PDF/DOCX extraction, resume rewriting, and production recruitment-platform integrations remain separate extensions.
 
 ## Skills demonstrated
 
-Python · ATS-style Analysis · Text Processing · Skill Extraction · Keyword Scoring · Multi-word Phrase Matching · JSON · HTML Reporting · Validation · Testing · CI/CD
+Python · ATS-style Analysis · NLP · Job Requirement Extraction · Document Parsing · PDF · DOCX · Skill Matching · Lexical Similarity · Truth-preserving Recommendations · JSON · HTML Reporting · Packaging · Testing · CI/CD · CodeQL · SBOM
